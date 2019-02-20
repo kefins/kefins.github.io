@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Techs Bond">
 <meta property="og:description" content="2019年初，想自己搭建一个博客平台，撰写一些自己的心得总结，方案选择上基本没有犹豫，近几年WordPress已经独树一帜，在网站建设方面可谓独领风骚，深受站长的喜爱，国内的不少知名网站均基于WordPress来构建，因此也计划基于WordPress来建建设一个博客平台。&amp;emsp;&amp;emsp;但是在具体操作时却泛起了多种思路，最基本思路自然是的基于LAMP环境建设，这是最为通用的方式了。但是考虑">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-20T15:32:26.327Z">
+<meta property="og:updated_time" content="2019-02-20T16:52:00.474Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于docker部署wordpress">
 <meta name="twitter:description" content="2019年初，想自己搭建一个博客平台，撰写一些自己的心得总结，方案选择上基本没有犹豫，近几年WordPress已经独树一帜，在网站建设方面可谓独领风骚，深受站长的喜爱，国内的不少知名网站均基于WordPress来构建，因此也计划基于WordPress来建建设一个博客平台。&amp;emsp;&amp;emsp;但是在具体操作时却泛起了多种思路，最基本思路自然是的基于LAMP环境建设，这是最为通用的方式了。但是考虑">
@@ -147,6 +147,10 @@
 
   <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
+
+    <a href="https://github.com/kefins">
+        <img width="149" height="149" style="position: absolute; top: 0; right: 0; border: 0;" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_orange_ff7600.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
+    </a>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-wrapper">
@@ -398,10 +402,10 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">$ docker version</span><br><span class="line">Client:</span><br><span class="line"> Version:           18.09.0</span><br><span class="line"> API version:       1.39</span><br><span class="line"> Go version:        go1.10.4</span><br><span class="line"> Git commit:        4d60db4</span><br><span class="line"> Built:             Wed Nov  7 00:48:22 2018</span><br><span class="line"> OS/Arch:           linux/amd64</span><br><span class="line"> Experimental:      <span class="literal">false</span></span><br><span class="line">Server: Docker Engine - Community</span><br><span class="line"> Engine:</span><br><span class="line">  Version:          18.09.0</span><br><span class="line">  API version:      1.39 (minimum version 1.12)</span><br><span class="line">  Go version:       go1.10.4</span><br><span class="line">  Git commit:       4d60db4</span><br><span class="line">  Built:            Wed Nov  7 00:19:08 2018</span><br><span class="line">  OS/Arch:          linux/amd64</span><br><span class="line">  Experimental:     <span class="literal">false</span></span><br></pre></td></tr></table></figure>
 </li>
 </ol>
-<h2 id="安装docker-compose"><a href="#安装docker-compose" class="headerlink" title="安装docker-compose"></a>安装docker-compose</h2><p>&emsp;&emsp;docker-compose 是 Docker 容器进行编排的工具，使用python语言编写,与docker/swarm配合度很高，定义和运行多容器的应用，可以一条命令启动多个容器，使用Docker Compose不再需要使用shell脚本来启动容器。<br>&emsp;&emsp;安装之前，要求已经安装好python环境，此处强烈建议大家升级到python3，直接采用pip命令安装。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install docker-compose</span><br></pre></td></tr></table></figure></p>
+<h2 id="安装docker-compose"><a href="#安装docker-compose" class="headerlink" title="安装docker-compose"></a>安装docker-compose</h2><p>&emsp;&emsp;docker-compose是Docker容器进行编排的工具，使用python语言编写,与docker/swarm配合度很高，定义和运行多容器的应用，可以一条命令启动多个容器，使用Docker Compose不再需要使用shell脚本来启动容器。<br>&emsp;&emsp;安装之前，要求已经安装好python环境，此处强烈建议大家升级到python3，直接采用pip命令安装。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install docker-compose</span><br></pre></td></tr></table></figure></p>
 <p>此外，还可以采取直接下载的方式安装<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sudo curl -L https://github.com/docker/compose/releases/download/1.16.1/docker-compose-`uname -s`-`uname -m` -o /usr/<span class="built_in">local</span>/bin/docker-compose</span><br><span class="line"></span><br><span class="line">$ sudo chmod +x /usr/<span class="built_in">local</span>/bin/docker-compose</span><br></pre></td></tr></table></figure></p>
 <p>&emsp;&emsp;安装完毕后，看查看docker-compose的版本信息，验证安装结果。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@swarm01 fendo]<span class="comment"># docker-compose version</span></span><br><span class="line">docker-compose version 1.21.2, build a133471</span><br><span class="line">docker-py version: 3.3.0</span><br><span class="line">CPython version: 2.7.5</span><br><span class="line">OpenSSL version: OpenSSL 1.0.2k-fips  26 Jan 2017</span><br></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;关于== docker compose ==的技术文档，还请各位看官移驾到<a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">官网</a>查看，此处仅做简单介绍，后续有需要再对其做详细介绍。docker-compose是一个用来把 docker命令自动化的部署命令，通过docker-compose的配置脚本，可以把所有繁复的docker操作通过一条命令自动化完成。通过编写docker-compose.yml脚本，docker-compose会读取此脚本中的配置，将其转换为对应的docker命令逐条执行，最终完成所有部署。</p>
+<p>&emsp;&emsp;关于docker compose的技术文档，还请各位看官移驾到<a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">官网</a>查看，此处仅做简单介绍，后续有需要再对其做详细介绍。docker-compose是一个用来把 docker命令自动化的部署命令，通过docker-compose的配置脚本，可以把所有繁复的docker操作通过一条命令自动化完成。通过编写docker-compose.yml脚本，docker-compose会读取此脚本中的配置，将其转换为对应的docker命令逐条执行，最终完成所有部署。</p>
 <h2 id="docker编排思路"><a href="#docker编排思路" class="headerlink" title="docker编排思路"></a>docker编排思路</h2><p>&emsp;&emsp;按照docker的设计思路，应尽量将每个服务放至独立的docker容器中，相互之间会有依赖关系，但运行时绝不会相互影响。Wordpress是使用PHP语言开发的博客平台，用户可以在支持PHP和MySQL数据库的服务器上架设属于自己的网站。基于WordPress搭建博客平台，依赖于有HTTP服务、数据库服务和PHP环境，最理想的编排方案应该分别将这些服务部署在独立的容器中。</p>
 <ul>
 <li>HTTP服务</li>
@@ -419,7 +423,7 @@
 <p>&emsp;&emsp;编辑完docker-compose.yml文件后，还需要设置nginx的配置文件，为方便制作，已经将相关代码全部放至到<a href="https://github.com/kefins/docker_wpress">github</a>上，可通过git命令直接下载。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/kefins/docker_wpress.git wpress</span><br></pre></td></tr></table></figure></p>
 <p>&emsp;&emsp;下载完毕后，切换至wpress目录，直接执行docker-compose命令，启动服务。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ docker-compose  up -d</span><br><span class="line">Creating network <span class="string">"wordpress_frontend"</span> with driver <span class="string">"bridge"</span></span><br><span class="line">Creating network <span class="string">"wordpress_backend"</span> with driver <span class="string">"bridge"</span></span><br><span class="line">Creating mariadb ... <span class="keyword">done</span></span><br><span class="line">Creating wordpress ... <span class="keyword">done</span></span><br><span class="line">Creating nginx     ... <span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
 <p>&emsp;&emsp;命令执行完毕后，WordPress服务就已完成部署，通过docker命令可以查看docker容器的创建情况。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ docker ps</span><br><span class="line">CONTAINER ID        IMAGE                        COMMAND                  CREATED             STATUS              PORTS                                           NAMES</span><br><span class="line">06e0f84bd9ec        nginx:latest                 <span class="string">"nginx -g 'daemon of…"</span>   6 minutes ago       Up 6 minutes        0.0.0.0:16001-&gt;80/tcp, 0.0.0.0:11431-&gt;443/tcp   nginx</span><br><span class="line">02e623fae167        wordpress:5.0.3-php7.2-fpm   <span class="string">"docker-entrypoint.s…"</span>   6 minutes ago       Up 6 minutes        0.0.0.0:9000-&gt;9000/tcp                          wordpress</span><br><span class="line">f663ddd12149        mariadb                      <span class="string">"docker-entrypoint.s…"</span>   6 minutes ago       Up 6 minutes        0.0.0.0:3306-&gt;3306/tcp                          mariadb</span><br></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;打开浏览器，输入== x.x.x.x/wp-admin/install.php ==，就会看到WordPress的安装界面。至此，就完成了所有的部署工作，可以开始配置WordPress，然后撰写第一篇博客了。</p>
+<p>&emsp;&emsp;打开浏览器，输入<strong>x.x.x.x/wp-admin/install.php</strong>，就会看到WordPress的安装界面。至此，就完成了所有的部署工作，可以开始配置WordPress，然后撰写第一篇博客了。</p>
 
       
     </div>
@@ -555,6 +559,22 @@
 
           
 
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/kefins" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:kefin@outlook.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
           
 
           
