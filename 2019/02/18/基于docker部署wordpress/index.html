@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="wordpress,docker,docker-compose,">
 
 
 
@@ -79,13 +79,18 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="Techs Bond">
-<meta property="og:url" content="https://github.com/kefins/kefins.github.io/index.html">
+<meta name="description" content="2019年初，想自己搭建一个博客平台，撰写一些自己的心得总结，方案选择上基本没有犹豫，近几年WordPress已经独树一帜，在网站建设方面可谓独领风骚，深受站长的喜爱，国内的不少知名网站均基于WordPress来构建，因此也计划基于WordPress来建建设一个博客平台。&amp;emsp;&amp;emsp;但是在具体操作时却泛起了多种思路，最基本思路自然是的基于LAMP环境建设，这是最为通用的方式了。但是考虑">
+<meta name="keywords" content="wordpress,docker,docker-compose">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于docker部署wordpress">
+<meta property="og:url" content="https://github.com/kefins/kefins.github.io/2019/02/18/基于docker部署wordpress/index.html">
 <meta property="og:site_name" content="Techs Bond">
+<meta property="og:description" content="2019年初，想自己搭建一个博客平台，撰写一些自己的心得总结，方案选择上基本没有犹豫，近几年WordPress已经独树一帜，在网站建设方面可谓独领风骚，深受站长的喜爱，国内的不少知名网站均基于WordPress来构建，因此也计划基于WordPress来建建设一个博客平台。&amp;emsp;&amp;emsp;但是在具体操作时却泛起了多种思路，最基本思路自然是的基于LAMP环境建设，这是最为通用的方式了。但是考虑">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-02-20T15:32:26.327Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Techs Bond">
+<meta name="twitter:title" content="基于docker部署wordpress">
+<meta name="twitter:description" content="2019年初，想自己搭建一个博客平台，撰写一些自己的心得总结，方案选择上基本没有犹豫，近几年WordPress已经独树一帜，在网站建设方面可谓独领风骚，深受站长的喜爱，国内的不少知名网站均基于WordPress来构建，因此也计划基于WordPress来建建设一个博客平台。&amp;emsp;&amp;emsp;但是在具体操作时却泛起了多种思路，最基本思路自然是的基于LAMP环境建设，这是最为通用的方式了。但是考虑">
 
 
 
@@ -115,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="https://github.com/kefins/kefins.github.io/">
+  <link rel="canonical" href="https://github.com/kefins/kefins.github.io/2019/02/18/基于docker部署wordpress/">
 
 
 
 
 
-  <title>Techs Bond</title>
+  <title>基于docker部署wordpress | Techs Bond</title>
   
 
 
@@ -140,8 +145,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-  page-home">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -264,9 +268,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -296,9 +300,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/02/18/基于docker部署wordpress/" itemprop="url">基于docker部署wordpress</a></h1>
+          <h1 class="post-title" itemprop="name headline">基于docker部署wordpress</h1>
         
 
         <div class="post-meta">
@@ -370,9 +372,7 @@
       
 
       
-        
-          
-            <p><strong>2019年初</strong>，想自己搭建一个博客平台，撰写一些自己的心得总结，方案选择上基本没有犹豫，近几年WordPress已经独树一帜，在网站建设方面可谓独领风骚，深受站长的喜爱，国内的不少知名网站均基于WordPress来构建，因此也计划基于WordPress来建建设一个博客平台。<br>&emsp;&emsp;但是在具体操作时却泛起了多种思路，最基本思路自然是的基于LAMP环境建设，这是最为通用的方式了。但是考虑到接触LXC已经有一段时间了，何不趁此机会基于容器来实践一把呢？一方面此方案确实有其优越性，在部署、维护方面有其独特的优越性；另一方面可以借此机会实践一下容器的编排技术。<br>&emsp;&emsp;首先给大家介绍一下硬件背景，稍微阐述一下我苦逼的折腾过程。家中有一台自己DIY的一台黑群晖NAS服务器 ，本来群晖直接安装在物理机上，但在一次升级时不小心把系统给升死了（黑的就是不招人待见！！可黑有黑的乐趣……），由于群晖没接显示器，再次重装又少不了一番折腾，而且还担心数据丢失。一气之下，在服务器上装了一个Win10系统，安装VMWare虚拟机，然后通过虚拟器安装群晖DSM，如此一来，所有数据可以都存放到虚拟磁盘中，备份速度要快很多，但这样会牺牲一定的访问速度，不过最终结果还算差强人意，局域网内10多M的速度还是有保障的，此乃硬件背景。<br>&emsp;&emsp;在上述硬件条件下，软件方案就面临多种选择，可以考虑直接在群晖虚拟机上折腾，还可以再起一个虚拟机来搭建，我能想到切实可行的至少有如下四种方案：</p>
+        <p><strong>2019年初</strong>，想自己搭建一个博客平台，撰写一些自己的心得总结，方案选择上基本没有犹豫，近几年WordPress已经独树一帜，在网站建设方面可谓独领风骚，深受站长的喜爱，国内的不少知名网站均基于WordPress来构建，因此也计划基于WordPress来建建设一个博客平台。<br>&emsp;&emsp;但是在具体操作时却泛起了多种思路，最基本思路自然是的基于LAMP环境建设，这是最为通用的方式了。但是考虑到接触LXC已经有一段时间了，何不趁此机会基于容器来实践一把呢？一方面此方案确实有其优越性，在部署、维护方面有其独特的优越性；另一方面可以借此机会实践一下容器的编排技术。<br>&emsp;&emsp;首先给大家介绍一下硬件背景，稍微阐述一下我苦逼的折腾过程。家中有一台自己DIY的一台黑群晖NAS服务器 ，本来群晖直接安装在物理机上，但在一次升级时不小心把系统给升死了（黑的就是不招人待见！！可黑有黑的乐趣……），由于群晖没接显示器，再次重装又少不了一番折腾，而且还担心数据丢失。一气之下，在服务器上装了一个Win10系统，安装VMWare虚拟机，然后通过虚拟器安装群晖DSM，如此一来，所有数据可以都存放到虚拟磁盘中，备份速度要快很多，但这样会牺牲一定的访问速度，不过最终结果还算差强人意，局域网内10多M的速度还是有保障的，此乃硬件背景。<br>&emsp;&emsp;在上述硬件条件下，软件方案就面临多种选择，可以考虑直接在群晖虚拟机上折腾，还可以再起一个虚拟机来搭建，我能想到切实可行的至少有如下四种方案：</p>
 <ol>
 <li>基于虚拟机中群晖自带的WordPress插件来搭建，后台仍然采用基于Debian的LAMP环境</li>
 <li>基于虚拟机中群晖的Docker来搭建</li>
@@ -421,8 +421,6 @@
 <p>&emsp;&emsp;命令执行完毕后，WordPress服务就已完成部署，通过docker命令可以查看docker容器的创建情况。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ docker ps</span><br><span class="line">CONTAINER ID        IMAGE                        COMMAND                  CREATED             STATUS              PORTS                                           NAMES</span><br><span class="line">06e0f84bd9ec        nginx:latest                 <span class="string">"nginx -g 'daemon of…"</span>   6 minutes ago       Up 6 minutes        0.0.0.0:16001-&gt;80/tcp, 0.0.0.0:11431-&gt;443/tcp   nginx</span><br><span class="line">02e623fae167        wordpress:5.0.3-php7.2-fpm   <span class="string">"docker-entrypoint.s…"</span>   6 minutes ago       Up 6 minutes        0.0.0.0:9000-&gt;9000/tcp                          wordpress</span><br><span class="line">f663ddd12149        mariadb                      <span class="string">"docker-entrypoint.s…"</span>   6 minutes ago       Up 6 minutes        0.0.0.0:3306-&gt;3306/tcp                          mariadb</span><br></pre></td></tr></table></figure></p>
 <p>&emsp;&emsp;打开浏览器，输入== x.x.x.x/wp-admin/install.php ==，就会看到WordPress的安装界面。至此，就完成了所有的部署工作，可以开始配置WordPress，然后撰写第一篇博客了。</p>
 
-          
-        
       
     </div>
     
@@ -437,14 +435,24 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/wordpress/" rel="tag"># wordpress</a>
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+            <a href="/tags/docker-compose/" rel="tag"># docker-compose</a>
+          
+        </div>
+      
+
+      
+      
+      
 
       
 
       
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -454,10 +462,11 @@
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -465,6 +474,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -485,8 +498,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -546,6 +568,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装docker"><span class="nav-number">1.</span> <span class="nav-text">安装docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装docker-compose"><span class="nav-number">2.</span> <span class="nav-text">安装docker-compose</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#docker编排思路"><span class="nav-number">3.</span> <span class="nav-text">docker编排思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编辑docker-compose-yml脚本"><span class="nav-number">4.</span> <span class="nav-text">编辑docker-compose.yml脚本</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -693,6 +731,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
