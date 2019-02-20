@@ -279,7 +279,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/kefins/kefins.github.io/2019/02/17/hello-world/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/kefins/kefins.github.io/2019/02/18/基于docker部署wordpress/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="kefins">
@@ -298,7 +298,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/02/17/hello-world/" itemprop="url">Hello World</a></h1>
+                <a class="post-title-link" href="/2019/02/18/基于docker部署wordpress/" itemprop="url">基于docker部署wordpress</a></h1>
         
 
         <div class="post-meta">
@@ -310,8 +310,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-17T01:00:08+08:00">
-                2019-02-17
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-18T23:53:00+08:00">
+                2019-02-18
               </time>
             
 
@@ -333,8 +333,197 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/搭建博客/" itemprop="url" rel="index">
-                    <span itemprop="name">搭建博客</span>
+                  <a href="/categories/build-blog/" itemprop="url" rel="index">
+                    <span itemprop="name">build-blog</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><strong>2019年初</strong>，想自己搭建一个博客平台，撰写一些自己的心得总结，方案选择上基本没有犹豫，近几年WordPress已经独树一帜，在网站建设方面可谓独领风骚，深受站长的喜爱，国内的不少知名网站均基于WordPress来构建，因此也计划基于WordPress来建建设一个博客平台。<br>&emsp;&emsp;但是在具体操作时却泛起了多种思路，最基本思路自然是的基于LAMP环境建设，这是最为通用的方式了。但是考虑到接触LXC已经有一段时间了，何不趁此机会基于容器来实践一把呢？一方面此方案确实有其优越性，在部署、维护方面有其独特的优越性；另一方面可以借此机会实践一下容器的编排技术。<br>&emsp;&emsp;首先给大家介绍一下硬件背景，稍微阐述一下我苦逼的折腾过程。家中有一台自己DIY的一台黑群晖NAS服务器 ，本来群晖直接安装在物理机上，但在一次升级时不小心把系统给升死了（黑的就是不招人待见！！可黑有黑的乐趣……），由于群晖没接显示器，再次重装又少不了一番折腾，而且还担心数据丢失。一气之下，在服务器上装了一个Win10系统，安装VMWare虚拟机，然后通过虚拟器安装群晖DSM，如此一来，所有数据可以都存放到虚拟磁盘中，备份速度要快很多，但这样会牺牲一定的访问速度，不过最终结果还算差强人意，局域网内10多M的速度还是有保障的，此乃硬件背景。<br>&emsp;&emsp;在上述硬件条件下，软件方案就面临多种选择，可以考虑直接在群晖虚拟机上折腾，还可以再起一个虚拟机来搭建，我能想到切实可行的至少有如下四种方案：</p>
+<ol>
+<li>基于虚拟机中群晖自带的WordPress插件来搭建，后台仍然采用基于Debian的LAMP环境</li>
+<li>基于虚拟机中群晖的Docker来搭建</li>
+<li>新建一虚拟机，安装一linux系统，搭建LAMP环境来搭建</li>
+<li>新建一虚拟机，基于Docker在搭建</li>
+</ol>
+<p>&emsp;&emsp;最终选择了第4种方案，不想再折腾群晖系统了，最重要的原因是考虑到数据的重要性，一旦把数据折腾丢了亏大了。另外群晖应该是基于Debian的系统，但已经被官方折腾的面目全非了，不再具备开源系统的通用性，软件安装和配置方面已不合常规，这种折腾还是能省就省吧。<br>&emsp;&emsp;新建虚拟机基于CentOS系统，此处不再赘述此系统在服务器领域的地位和配置方式，默认为观看此篇博客的人都具备虚拟机的安装以及基本的Linux系统配置基础。</p>
+<h2 id="安装docker"><a href="#安装docker" class="headerlink" title="安装docker"></a>安装docker</h2><p>&emsp;&emsp; Docker从1.13版本之后采用时间线的方式作为版本号，分为社区版CE和企业版EE。社区版是免费提供给个人开发者和小型团体使用的，企业版会提供额外的收费服务，比如经过官方测试认证过的基础设施、容器、插件等。社区版按照stable和edge两种方式发布，每个季度更新stable版本，如17.06，17.09；每个月份更新edge版本，如17.09，17.10。</p>
+<ol>
+<li><p>设置yum源</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装依赖包</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo yum install -y yum-utils device-mapper-persistent-data lvm2</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装docker-ce</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install docker-ce</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动docker守护进程并设置为开机启动</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo systemctl start docker</span><br><span class="line">$ sudo systemctl <span class="built_in">enable</span> docker</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>验证安装结果</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">$ docker version</span><br><span class="line">Client:</span><br><span class="line"> Version:           18.09.0</span><br><span class="line"> API version:       1.39</span><br><span class="line"> Go version:        go1.10.4</span><br><span class="line"> Git commit:        4d60db4</span><br><span class="line"> Built:             Wed Nov  7 00:48:22 2018</span><br><span class="line"> OS/Arch:           linux/amd64</span><br><span class="line"> Experimental:      <span class="literal">false</span></span><br><span class="line">Server: Docker Engine - Community</span><br><span class="line"> Engine:</span><br><span class="line">  Version:          18.09.0</span><br><span class="line">  API version:      1.39 (minimum version 1.12)</span><br><span class="line">  Go version:       go1.10.4</span><br><span class="line">  Git commit:       4d60db4</span><br><span class="line">  Built:            Wed Nov  7 00:19:08 2018</span><br><span class="line">  OS/Arch:          linux/amd64</span><br><span class="line">  Experimental:     <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="安装docker-compose"><a href="#安装docker-compose" class="headerlink" title="安装docker-compose"></a>安装docker-compose</h2><p>&emsp;&emsp;docker-compose 是 Docker 容器进行编排的工具，使用python语言编写,与docker/swarm配合度很高，定义和运行多容器的应用，可以一条命令启动多个容器，使用Docker Compose不再需要使用shell脚本来启动容器。<br>&emsp;&emsp;安装之前，要求已经安装好python环境，此处强烈建议大家升级到python3，直接采用pip命令安装。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install docker-compose</span><br></pre></td></tr></table></figure></p>
+<p>此外，还可以采取直接下载的方式安装<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ sudo curl -L https://github.com/docker/compose/releases/download/1.16.1/docker-compose-`uname -s`-`uname -m` -o /usr/<span class="built_in">local</span>/bin/docker-compose</span><br><span class="line"></span><br><span class="line">$ sudo chmod +x /usr/<span class="built_in">local</span>/bin/docker-compose</span><br></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;安装完毕后，看查看docker-compose的版本信息，验证安装结果。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@swarm01 fendo]<span class="comment"># docker-compose version</span></span><br><span class="line">docker-compose version 1.21.2, build a133471</span><br><span class="line">docker-py version: 3.3.0</span><br><span class="line">CPython version: 2.7.5</span><br><span class="line">OpenSSL version: OpenSSL 1.0.2k-fips  26 Jan 2017</span><br></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;关于== docker compose ==的技术文档，还请各位看官移驾到<a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">官网</a>查看，此处仅做简单介绍，后续有需要再对其做详细介绍。docker-compose是一个用来把 docker命令自动化的部署命令，通过docker-compose的配置脚本，可以把所有繁复的docker操作通过一条命令自动化完成。通过编写docker-compose.yml脚本，docker-compose会读取此脚本中的配置，将其转换为对应的docker命令逐条执行，最终完成所有部署。</p>
+<h2 id="docker编排思路"><a href="#docker编排思路" class="headerlink" title="docker编排思路"></a>docker编排思路</h2><p>&emsp;&emsp;按照docker的设计思路，应尽量将每个服务放至独立的docker容器中，相互之间会有依赖关系，但运行时绝不会相互影响。Wordpress是使用PHP语言开发的博客平台，用户可以在支持PHP和MySQL数据库的服务器上架设属于自己的网站。基于WordPress搭建博客平台，依赖于有HTTP服务、数据库服务和PHP环境，最理想的编排方案应该分别将这些服务部署在独立的容器中。</p>
+<ul>
+<li>HTTP服务</li>
+<li>SQL服务</li>
+<li>PHP环境</li>
+<li>Wordpress环境</li>
+</ul>
+<p>&emsp;&emsp;此处为避免重新编译docker镜像，决定采取直接从docker hub上拉取官方认证的镜像，官方提供的Wordpress镜像中已经集成了PHP环境，因此不需要单独部署一个PHP docker；HTTP服务可以选择Apache或者Nginx，此处选择Nginx；SQL可以选择MySql或者MariaDB，此处选择了MariaDB。总共需要三个docker镜像。</p>
+<ul>
+<li><a href="https://hub.docker.com/_/wordpress" target="_blank" rel="noopener">WordPress</a></li>
+<li><a href="https://hub.docker.com/_/nginx" target="_blank" rel="noopener">nginx</a></li>
+<li><a href="https://hub.docker.com/_/mariadb" target="_blank" rel="noopener">mariadb</a></li>
+</ul>
+<h2 id="编辑docker-compose-yml脚本"><a href="#编辑docker-compose-yml脚本" class="headerlink" title="编辑docker-compose.yml脚本"></a>编辑docker-compose.yml脚本</h2><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'3'</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line"></span><br><span class="line"><span class="attr">    mysql:</span></span><br><span class="line"><span class="attr">        image:</span> <span class="string">mariadb</span></span><br><span class="line"><span class="attr">        container_name:</span> <span class="string">mariadb</span></span><br><span class="line"><span class="attr">        ports:</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">'3306:3306'</span></span><br><span class="line"><span class="attr">        volumes:</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">./sqldb:/var/lib/mysql</span></span><br><span class="line"><span class="attr">        environment:</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">MYSQL_ROOT_PASSWORD=UNJ^)-+YYunfn</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">MYSQL_DATABASE=wordpress</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">MYSQL_USER=wordpress</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">MYSQL_PASSWORD=aqwe123</span></span><br><span class="line"><span class="attr">        networks:</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">backend</span></span><br><span class="line"><span class="attr">        restart:</span> <span class="string">always</span></span><br><span class="line"></span><br><span class="line"><span class="attr">    wordpress:</span></span><br><span class="line"><span class="attr">        depends_on:</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">mysql</span></span><br><span class="line"><span class="attr">        image:</span> <span class="attr">wordpress:5.0.3-php7.2-fpm</span></span><br><span class="line"><span class="attr">        container_name:</span> <span class="string">wordpress</span></span><br><span class="line"><span class="attr">        ports:</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">'9000:9000'</span></span><br><span class="line"><span class="attr">        volumes:</span></span><br><span class="line">            <span class="comment">#- ./php-fpm:/usr/local/etc/php-fpm.d</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">./www:/var/www/html</span></span><br><span class="line"><span class="attr">        environment:</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">WORDPRESS_DB_NAME=wordpress</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">WORDPRESS_TABLE_PREFIX=wp_</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">WORDPRESS_DB_HOST=mysql:3306</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">WORDPRESS_DB_USER=wordpress</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">WORDPRESS_DB_PASSWORD=aqwe123</span></span><br><span class="line"><span class="attr">        links:</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">mysql</span></span><br><span class="line"><span class="attr">        networks:</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">frontend</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">backend</span></span><br><span class="line"><span class="attr">        restart:</span> <span class="string">always</span></span><br><span class="line"></span><br><span class="line"><span class="attr">    nginx:</span></span><br><span class="line"><span class="attr">        image:</span> <span class="attr">nginx:latest</span></span><br><span class="line"><span class="attr">        container_name:</span> <span class="string">nginx</span></span><br><span class="line"><span class="attr">        ports:</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">'16001:80'</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">"11431:443"</span></span><br><span class="line"><span class="attr">        volumes:</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">./nginx:/etc/nginx/conf.d</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">./logs/nginx:/var/log/nginx</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">./www:/var/www/html</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">/var/run/docker.sock:/tmp/docker.sock:ro</span></span><br><span class="line"><span class="attr">        links:</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">wordpress</span></span><br><span class="line"><span class="attr">        networks:</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">frontend</span></span><br><span class="line"><span class="attr">        restart:</span> <span class="string">always</span></span><br><span class="line"></span><br><span class="line"><span class="attr">networks:</span></span><br><span class="line"><span class="attr">    frontend:</span></span><br><span class="line">        <span class="comment">#name: frontend</span></span><br><span class="line"><span class="attr">        driver:</span> <span class="string">bridge</span></span><br><span class="line"><span class="attr">    backend:</span></span><br><span class="line">        <span class="comment">#name: backend</span></span><br><span class="line"><span class="attr">        driver:</span> <span class="string">bridge</span></span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;编辑完docker-compose.yml文件后，还需要设置nginx的配置文件，为方便制作，已经将相关代码全部放至到<a href="https://github.com/kefins/docker_wpress">github</a>上，可通过git命令直接下载。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/kefins/docker_wpress.git wpress</span><br></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;下载完毕后，切换至wpress目录，直接执行docker-compose命令，启动服务。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ docker-compose  up -d</span><br><span class="line">Creating network <span class="string">"wordpress_frontend"</span> with driver <span class="string">"bridge"</span></span><br><span class="line">Creating network <span class="string">"wordpress_backend"</span> with driver <span class="string">"bridge"</span></span><br><span class="line">Creating mariadb ... <span class="keyword">done</span></span><br><span class="line">Creating wordpress ... <span class="keyword">done</span></span><br><span class="line">Creating nginx     ... <span class="keyword">done</span></span><br></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;命令执行完毕后，WordPress服务就已完成部署，通过docker命令可以查看docker容器的创建情况。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ docker ps</span><br><span class="line">CONTAINER ID        IMAGE                        COMMAND                  CREATED             STATUS              PORTS                                           NAMES</span><br><span class="line">06e0f84bd9ec        nginx:latest                 <span class="string">"nginx -g 'daemon of…"</span>   6 minutes ago       Up 6 minutes        0.0.0.0:16001-&gt;80/tcp, 0.0.0.0:11431-&gt;443/tcp   nginx</span><br><span class="line">02e623fae167        wordpress:5.0.3-php7.2-fpm   <span class="string">"docker-entrypoint.s…"</span>   6 minutes ago       Up 6 minutes        0.0.0.0:9000-&gt;9000/tcp                          wordpress</span><br><span class="line">f663ddd12149        mariadb                      <span class="string">"docker-entrypoint.s…"</span>   6 minutes ago       Up 6 minutes        0.0.0.0:3306-&gt;3306/tcp                          mariadb</span><br></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;打开浏览器，输入== x.x.x.x/wp-admin/install.php ==，就会看到WordPress的安装界面。至此，就完成了所有的部署工作，可以开始配置WordPress，然后撰写第一篇博客了。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://github.com/kefins/kefins.github.io/2019/02/18/hello-world/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="kefins">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Techs Bond">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/02/18/hello-world/" itemprop="url">Hello World</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-18T23:34:46+08:00">
+                2019-02-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/build-blog/" itemprop="url" rel="index">
+                    <span itemprop="name">build-blog</span>
                   </a>
                 </span>
 
@@ -462,7 +651,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -484,7 +673,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
