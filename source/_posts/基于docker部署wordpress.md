@@ -59,7 +59,7 @@ Server: Docker Engine - Community
 
 ## 安装docker-compose
 
-&emsp;&emsp;docker-compose 是 Docker 容器进行编排的工具，使用python语言编写,与docker/swarm配合度很高，定义和运行多容器的应用，可以一条命令启动多个容器，使用Docker Compose不再需要使用shell脚本来启动容器。
+&emsp;&emsp;docker-compose是Docker容器进行编排的工具，使用python语言编写,与docker/swarm配合度很高，定义和运行多容器的应用，可以一条命令启动多个容器，使用Docker Compose不再需要使用shell脚本来启动容器。
 &emsp;&emsp;安装之前，要求已经安装好python环境，此处强烈建议大家升级到python3，直接采用pip命令安装。
 ```bash
 pip install docker-compose
@@ -78,7 +78,7 @@ docker-py version: 3.3.0
 CPython version: 2.7.5
 OpenSSL version: OpenSSL 1.0.2k-fips  26 Jan 2017
 ```
-&emsp;&emsp;关于== docker compose ==的技术文档，还请各位看官移驾到[官网](https://docs.docker.com/compose/)查看，此处仅做简单介绍，后续有需要再对其做详细介绍。docker-compose是一个用来把 docker命令自动化的部署命令，通过docker-compose的配置脚本，可以把所有繁复的docker操作通过一条命令自动化完成。通过编写docker-compose.yml脚本，docker-compose会读取此脚本中的配置，将其转换为对应的docker命令逐条执行，最终完成所有部署。
+&emsp;&emsp;关于docker compose的技术文档，还请各位看官移驾到[官网](https://docs.docker.com/compose/)查看，此处仅做简单介绍，后续有需要再对其做详细介绍。docker-compose是一个用来把 docker命令自动化的部署命令，通过docker-compose的配置脚本，可以把所有繁复的docker操作通过一条命令自动化完成。通过编写docker-compose.yml脚本，docker-compose会读取此脚本中的配置，将其转换为对应的docker命令逐条执行，最终完成所有部署。
 
 ## docker编排思路
 &emsp;&emsp;按照docker的设计思路，应尽量将每个服务放至独立的docker容器中，相互之间会有依赖关系，但运行时绝不会相互影响。Wordpress是使用PHP语言开发的博客平台，用户可以在支持PHP和MySQL数据库的服务器上架设属于自己的网站。基于WordPress搭建博客平台，依赖于有HTTP服务、数据库服务和PHP环境，最理想的编排方案应该分别将这些服务部署在独立的容器中。
