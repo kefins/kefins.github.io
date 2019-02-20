@@ -186,7 +186,7 @@ CONTAINER ID        IMAGE                        COMMAND                  CREATE
 f663ddd12149        mariadb                      "docker-entrypoint.s…"   6 minutes ago       Up 6 minutes        0.0.0.0:3306->3306/tcp                          mariadb
 ```
 
-&emsp;&emsp;打开浏览器，输入== x.x.x.x/wp-admin/install.php ==，就会看到WordPress的安装界面。至此，就完成了所有的部署工作，可以开始配置WordPress，然后撰写第一篇博客了。
+&emsp;&emsp;打开浏览器，输入**x.x.x.x/wp-admin/install.php**，就会看到WordPress的安装界面。至此，就完成了所有的部署工作，可以开始配置WordPress，然后撰写第一篇博客了。
 
 
 
